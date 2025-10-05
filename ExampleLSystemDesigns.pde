@@ -1,4 +1,4 @@
-// ExampleLSystemDesigns - contains helper methods to create and 
+/ ExampleLSystemDesigns - contains helper methods to create and 
 // initialize an LSystem
 // to set up parameters and init the LSystem (from the main file)
 
@@ -23,59 +23,6 @@ LSystem initSquare() {
   // Create any production rules
   HashMap<Character, String> rules = new HashMap<>();
   rules.put('F', "F+F-F-FF+F+F-F");
-    
-  // Create and return the Lsystem
-  return new LSystem(axiom, rules, moveDist, rotateAngle, scaleFactor);
-}
-
-// Task 3: Design 1
-LSystem inittree() {
-  // initialize turtle variables
-  float moveDist = 70;
-  float rotateAngle = 36;
-  float scaleFactor = 1;
-  
-  // The intial axiom / input string
-  String axiom = "F";
-  
-  // Create any production rules
-  HashMap<Character, String> rules = new HashMap<>();
-  rules.put('F', "F[+F]F[-F]F");
-    
-  // Create and return the Lsystem
-  return new LSystem(axiom, rules, moveDist, rotateAngle, scaleFactor);
-}
-
-// Task 3: Design 2
-LSystem initSnow() {
-  // initialize turtle variables
-  float moveDist = 64;
-  float rotateAngle = 72;
-  float scaleFactor = 1;
-  
-  // The intial axiom / input string
-  String axiom = "F-F-F-F-F";
-  
-  // Create any production rules
-  HashMap<Character, String> rules = new HashMap<>();
-  rules.put('F', "F-F-F++F+F-F");
-    
-  // Create and return the Lsystem
-  return new LSystem(axiom, rules, moveDist, rotateAngle, scaleFactor);
-}
-// Task 3: Design 3
-LSystem initCircut() {
-  // initialize turtle variables
-  float moveDist = 64;
-  float rotateAngle = 55;
-  float scaleFactor = 1;
-  
-  // The intial axiom / input string
-  String axiom = "F+F-F-F+F";
-  
-  // Create any production rules
-  HashMap<Character, String> rules = new HashMap<>();
-  rules.put('F', "F[+F]F[-F][F]");
     
   // Create and return the Lsystem
   return new LSystem(axiom, rules, moveDist, rotateAngle, scaleFactor);
