@@ -39,17 +39,7 @@ void setup() {
   // to create your l-system
   
   // Task 2: Example Code
-  //lSys = initSquare();
-  
-  // Task 3: Design 1
- //lSys = inittree();
- 
- // Task 3: Design 2
-  //lSys = initSnow();
-  
-  // Task 3: Design 3
-  lSys = initCircut();
-  
+  lSys = initSquare();
   
   // Don't loop the draw function
   noLoop();
@@ -140,17 +130,8 @@ void resetTurtle() {
   // NOTE: You can change the start position below if the image doesn't fit.
   // y = height-20 works well if you need to draw a tree at the bottom
  
- // Task 2: Example Code
- //t.goToPoint(width/2, height/2);
- 
- // Task 3: Design 1
-  //t.goToPoint(width/2, height-10);
- 
-  // Task 3: Design 2
-  //t.goToPoint(width-5, height/2);
-  
-  // Task 3: Design 3
-  t.goToPoint(width/2, height-10);
+ /Task 2: Example Code
+ t.goToPoint(width/2, height/2);
   
   t.setHeading(0);
   t.penDown();
