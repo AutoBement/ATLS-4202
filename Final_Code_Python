@@ -1,0 +1,131 @@
+import Rhino.Geometry as rg
+import math
+
+# --- Defensive casting / defaults ---
+try:
+    levels = int(Levels)
+except:
+    levels = 3
+
+# Slots_Per_Level is  a list.
+slot_list = []
+
+# Convert list inputs to ints
+for s in Slots_Per_Level:
+    try:
+        slot_list.append(int(s))
+    except:
+        slot_list.append(1)
+
+# If the user lists too few or too many entries, correct it
+if len(slot_list) < levels:
+    # repeat last value
+    last = slot_list[-1] if slot_list else 1
+    slot_list.extend([last] * (levels - len(slot_list)))
+elif len(slot_list) > levels:
+    slot_list = slot_list[:levels]
+
+# Ensure no slot count is less than 1
+slot_list = [max(1, v) for v in slot_list]
+
+# --- Base dimensional inputs ---
+shelf_w = float(Shelf_Width)
+shelf_h = float(Shelf_Height)
+shelf_d = float(Shelf_Depth)
+divider_t = float(Divider_Thickness)
+shelf_t = float(Shelf_Thickness)
+scale_factor = float(Scale_Factor) if 'Scale_Factor' in globals() else 1.0
+
+# --- Basic validation ---
+if levels < 1:
+    levels = 1
+if shelf_w <= 0 or shelf_h <= 0 or shelf_d <= 0:
+    raise ValueError("Shelf dimensions must be > 0")
+if divider_t <= 0:
+    divider_t = 1.0
+if shelf_t <= 0:
+    shelf_t = 1.0
+if scale_factor <= 0:
+    scale_factor = 1.0
+
+# --- Compute level height ---
+level_height = shelf_h / float(levels)
+
+# Helper to create a rectangular Brep (box)
+def make_box(x, y, w, h, depth):
+    base_plane = rg.Plane(rg.Point3d(x, y, 0.0), rg.Vector3d.XAxis, rg.Vector3d.YAxis)
+    bx = rg.Interval(0.0, w)
+    by = rg.Interval(0.0, h)
+    bz = rg.Interval(0.0, depth)
+    box = rg.Box(base_plane, bx, by, bz)
+    return box.ToBrep()
+
+breps = []
+
+# --- Horizontal shelf plates (top/bottom of each level) ---
+for i in range(levels + 1):
+    y = i * level_height
+    plate = make_box(
+        0.0,
+        y - (shelf_t / 2.0),
+        shelf_w,
+        shelf_t,
+        shelf_d
+    )
+    breps.append(plate)
+
+# --- Vertical dividers: now per LEVEL ---
+for level in range(levels):
+
+    slots = slot_list[level]
+
+    total_dividers = (slots + 1) * divider_t
+    usable_width = shelf_w - total_dividers
+
+    # Guard against impossible geometry
+    if usable_width <= 0:
+        slots = 1
+        total_dividers = (slots + 1) * divider_t
+        usable_width = max(1.0, shelf_w - total_dividers)
+
+    slot_width = usable_width / float(slots)
+
+    # The Y-position where this level starts
+    y0 = level * level_height
+
+    # Build dividers for this level only
+    cur_x = 0.0
+    for i in range(slots + 1):
+        divider = make_box(
+            cur_x,
+            y0,
+            divider_t,
+            level_height,
+            shelf_d
+        )
+        breps.append(divider)
+        cur_x += divider_t + slot_width
+
+# --- Back panel ---
+back = make_box(0.0, 0.0, shelf_w, shelf_h, shelf_t/4.0)
+breps.append(back)
+
+# --- Scale for 3D printing ---
+if abs(scale_factor - 1.0) > 1e-9:
+    t = rg.Transform.Scale(rg.Point3d(0,0,0), scale_factor)
+    scaled = []
+    for b in breps:
+        nb = b.DuplicateBrep()
+        nb.Transform(t)
+        scaled.append(nb)
+    breps = scaled
+
+# --- Tests and debugging ---
+# --- Encures the code works ---
+print(Shelf_Width, Shelf_Height, Shelf_Depth, Levels, Slots_Per_Level, Divider_Thickness, Shelf_Thickness, Scale_Factor)
+print("Brep count =", len(breps))
+valid = [b is not None and b.IsValid for b in breps]
+print("Valid breps:", valid)
+
+# --- Final Output ---
+Shelf = breps
